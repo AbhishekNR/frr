@@ -678,7 +678,8 @@ void pim_bsm_clear(struct pim_instance *pim)
 		/* RP not found for the group grp */
 		if (pim_rpf_addr_is_inaddr_none(&trp_info->rp)) {
 			pim_upstream_rpf_clear(pim, up);
-			pim_rp_set_upstream_addr(pim, &up->upstream_addr,
+			pim_rp_set_upstream_addr(pim,
+						 &up->upstream_addr.ipaddr_v4,
 						 up->sg.src.ipaddr_v4, up->sg.grp.ipaddr_v4);
 		} else {
 			/* RP found for the group grp */
