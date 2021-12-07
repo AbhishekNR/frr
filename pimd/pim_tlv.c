@@ -553,7 +553,8 @@ int pim_parse_addr_group(struct prefix_sg *sg, const uint8_t *buf, int buf_size)
 			return -3;
 		}
 
-		memcpy(&sg->grp.ipaddr_v4.s_addr, addr, sizeof(struct in_addr));
+		memcpy(&sg->grp.ipaddr_v4.s_addr, addr,
+		       sizeof(struct in_addr));
 
 		addr += sizeof(struct in_addr);
 

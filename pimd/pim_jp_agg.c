@@ -205,7 +205,8 @@ int pim_jp_agg_is_in_list(struct list *group, struct pim_upstream *up)
 	struct pim_jp_sources *js = NULL;
 
 	for (ALL_LIST_ELEMENTS(group, node, nnode, jag)) {
-		if (jag->group.s_addr == up->sg.grp.ipaddr_v4.s_addr)
+		if (jag->group.s_addr
+		    == up->sg.grp.ipaddr_v4.s_addr)
 			break;
 	}
 

@@ -111,8 +111,7 @@ static void pim_upstream_find_new_children(struct pim_instance *pim,
 
 	frr_each (rb_pim_upstream, &pim->upstream_head, child) {
 		if ((up->sg.grp.ipaddr_v4.s_addr != INADDR_ANY)
-		    && (child->sg.grp.ipaddr_v4.s_addr
-			== up->sg.grp.ipaddr_v4.s_addr)
+		    && (child->sg.grp.ipaddr_v4.s_addr == up->sg.grp.ipaddr_v4.s_addr)
 		    && (child != up)) {
 			child->parent = up;
 			listnode_add_sort(up->sources, child);
@@ -670,15 +669,15 @@ void pim_upstream_update_use_rpt(struct pim_upstream *up,
 	 * In all other cases the source will stay along the RPT and
 	 * IIF=RPF_interface(RP).
 	 */
-	if (up->join_state == PIM_UPSTREAM_JOINED
-	    || PIM_UPSTREAM_FLAG_TEST_FHR(up->flags)
-	    || pim_if_connected_to_source(up->rpf.source_nexthop.interface,
-					  up->sg.src.ipaddr_v4)
-	    ||
-	    /* XXX - need to switch this to a more efficient
-	     * lookup API
-	     */
-	    I_am_RP(up->pim, up->sg.grp.ipaddr_v4))
+	if (up->join_state == PIM_UPSTREAM_JOINED ||
+			PIM_UPSTREAM_FLAG_TEST_FHR(up->flags) ||
+			pim_if_connected_to_source(
+				up->rpf.source_nexthop.interface,
+				up->sg.src.ipaddr_v4) ||
+			/* XXX - need to switch this to a more efficient
+			 * lookup API
+			 */
+			I_am_RP(up->pim, up->sg.grp.ipaddr_v4))
 		/* use SPT */
 		PIM_UPSTREAM_FLAG_UNSET_USE_RPT(up->flags);
 	else
@@ -801,8 +800,8 @@ void pim_upstream_switch(struct pim_instance *pim, struct pim_upstream *up,
 		/* IHR, Trigger SGRpt on *,G IIF to prune S,G from RPT towards
 		   RP.
 		   If I am RP for G then send S,G prune to its IIF. */
-		if (pim_upstream_is_sg_rpt(up) && up->parent
-		    && !I_am_RP(pim, up->sg.grp.ipaddr_v4))
+		if (pim_upstream_is_sg_rpt(up) && up->parent &&
+				!I_am_RP(pim, up->sg.grp.ipaddr_v4))
 			send_xg_jp = true;
 
 		pim_jp_agg_single_upstream_send(&up->rpf, up, 0 /* prune */);
@@ -887,7 +886,8 @@ static struct pim_upstream *pim_upstream_new(struct pim_instance *pim,
 	 * configured and retain the upstream data structure
 	 */
 	if (!pim_rp_set_upstream_addr(pim, &up->upstream_addr,
-				      sg->src.ipaddr_v4, sg->grp.ipaddr_v4)) {
+				      sg->src.ipaddr_v4,
+				      sg->grp.ipaddr_v4)) {
 		if (PIM_DEBUG_PIM_TRACE)
 			zlog_debug("%s: Received a (*,G) with no RP configured",
 				   __func__);
@@ -1993,7 +1993,8 @@ bool pim_upstream_equal(const void *arg1, const void *arg2)
 	const struct pim_upstream *up2 = (const struct pim_upstream *)arg2;
 
 	if ((up1->sg.grp.ipaddr_v4.s_addr == up2->sg.grp.ipaddr_v4.s_addr)
-	    && (up1->sg.src.ipaddr_v4.s_addr == up2->sg.src.ipaddr_v4.s_addr))
+	    && (up1->sg.src.ipaddr_v4.s_addr
+		== up2->sg.src.ipaddr_v4.s_addr))
 		return true;
 
 	return false;

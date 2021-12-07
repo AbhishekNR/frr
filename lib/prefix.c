@@ -1111,25 +1111,13 @@ const char *prefix_sg2str(const struct prefix_sg *sg, char *sg_str)
 		char src_str[INET_ADDRSTRLEN];
 		char grp_str[INET_ADDRSTRLEN];
 
+	if (sg->family == AF_INET) {
 		prefix_mcast_inet4_dump("<src?>", sg->src.ipaddr_v4, src_str,
 					sizeof(src_str));
 		prefix_mcast_inet4_dump("<grp?>", sg->grp.ipaddr_v4, grp_str,
 					sizeof(grp_str));
-
-		snprintf(sg_str, PREFIX_SG_STR_LEN, "(%s,%s)", src_str,
-			 grp_str);
-	} else if (sg->family == AF_INET6) {
-		char src_str[INET6_ADDRSTRLEN];
-		char grp_str[INET6_ADDRSTRLEN];
-
-		prefix_mcast_inet6_dump("<src?>", sg->src.ipaddr_v6, src_str,
-					sizeof(src_str));
-		prefix_mcast_inet6_dump("<grp?>", sg->grp.ipaddr_v6, grp_str,
-					sizeof(grp_str));
-
-		snprintf(sg_str, PREFIX_SG_STR_LEN, "(%s,%s)", src_str,
-			 grp_str);
 	}
+	snprintf(sg_str, PREFIX_SG_STR_LEN, "(%s,%s)", src_str, grp_str);
 
 	return sg_str;
 }

@@ -386,7 +386,8 @@ static int igmp_recv_query(struct igmp_sock *igmp, int query_version,
 				ntohl(igmp->ifaddr.s_addr), from_str,
 				ntohl(from.s_addr));
 		}
-		if (ntohl(from.s_addr) < ntohl(igmp->querier_addr.s_addr))
+		if (ntohl(from.s_addr)
+		    < ntohl(igmp->querier_addr.s_addr))
 			igmp->querier_addr.s_addr = from.s_addr;
 
 		pim_igmp_other_querier_timer_on(igmp);
@@ -651,8 +652,8 @@ void pim_igmp_general_query_on(struct igmp_sock *igmp)
 
 	if (PIM_DEBUG_IGMP_TRACE) {
 		char ifaddr_str[INET_ADDRSTRLEN];
-		pim_inet4_dump("<ifaddr?>", igmp->ifaddr, ifaddr_str,
-			       sizeof(ifaddr_str));
+		pim_inet4_dump("<ifaddr?>", igmp->ifaddr,
+			       ifaddr_str, sizeof(ifaddr_str));
 		zlog_debug(
 			"Querier %s scheduling %d-second (%s) TIMER event for IGMP query on fd=%d",
 			ifaddr_str, query_interval,

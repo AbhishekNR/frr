@@ -98,8 +98,8 @@ static void recv_join(struct interface *ifp, struct pim_neighbor *neigh,
 		if (sg->src.ipaddr_v4.s_addr != rp->rpf_addr.u.prefix4.s_addr) {
 			char received_rp[INET_ADDRSTRLEN];
 			char local_rp[INET_ADDRSTRLEN];
-			pim_inet4_dump("<received?>", sg->src.ipaddr_v4,
-				       received_rp, sizeof(received_rp));
+			pim_inet4_dump("<received?>", sg->src.ipaddr_v4, received_rp,
+				       sizeof(received_rp));
 			pim_inet4_dump("<local?>", rp->rpf_addr.u.prefix4,
 				       local_rp, sizeof(local_rp));
 			zlog_warn(
@@ -158,8 +158,8 @@ static void recv_prune(struct interface *ifp, struct pim_neighbor *neigh,
 		if (PIM_DEBUG_PIM_TRACE) {
 			char received_rp[INET_ADDRSTRLEN];
 
-			pim_inet4_dump("<received?>", sg->src.ipaddr_v4,
-				       received_rp, sizeof(received_rp));
+			pim_inet4_dump("<received?>", sg->src.ipaddr_v4, received_rp,
+				       sizeof(received_rp));
 			zlog_debug("%s: Prune received with RP(%s) for %pSG4",
 				   __func__, received_rp, sg);
 		}

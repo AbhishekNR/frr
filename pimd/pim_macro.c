@@ -302,7 +302,8 @@ pim_macro_ch_my_assert_metric_eval(const struct pim_ifchannel *ch)
 	if (pim_ifp) {
 		if (PIM_IF_FLAG_TEST_COULD_ASSERT(ch->flags)) {
 			return pim_macro_spt_assert_metric(
-				&ch->upstream->rpf, pim_ifp->primary_address);
+				&ch->upstream->rpf,
+				pim_ifp->primary_address);
 		}
 	}
 

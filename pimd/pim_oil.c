@@ -329,8 +329,8 @@ void pim_channel_del_inherited_oif(struct channel_oil *c_oil,
 	/* if an inherited OIF is being removed join-desired can change
 	 * if the inherited OIL is now empty and KAT is running
 	 */
-	if (up && up->sg.src.ipaddr_v4.s_addr != INADDR_ANY
-	    && pim_upstream_empty_inherited_olist(up))
+	if (up && up->sg.src.ipaddr_v4.s_addr != INADDR_ANY &&
+			pim_upstream_empty_inherited_olist(up))
 		pim_upstream_update_join_desired(up->pim, up);
 }
 

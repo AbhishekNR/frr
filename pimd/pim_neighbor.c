@@ -257,8 +257,8 @@ void pim_neighbor_timer_reset(struct pim_neighbor *neigh, uint16_t holdtime)
 
 	if (PIM_DEBUG_PIM_TRACE_DETAIL) {
 		char src_str[INET_ADDRSTRLEN];
-		pim_inet4_dump("<src?>", neigh->source_addr, src_str,
-			       sizeof(src_str));
+		pim_inet4_dump("<src?>", neigh->source_addr,
+			       src_str, sizeof(src_str));
 		zlog_debug("%s: starting %u sec timer for neighbor %s on %s",
 			   __func__, neigh->holdtime, src_str,
 			   neigh->interface->name);
@@ -275,8 +275,8 @@ static int on_neighbor_jp_timer(struct thread *t)
 
 	if (PIM_DEBUG_PIM_TRACE) {
 		char src_str[INET_ADDRSTRLEN];
-		pim_inet4_dump("<src?>", neigh->source_addr, src_str,
-			       sizeof(src_str));
+		pim_inet4_dump("<src?>", neigh->source_addr,
+			       src_str, sizeof(src_str));
 		zlog_debug("%s:Sending JP Agg to %s on %s with %d groups",
 			   __func__, src_str, neigh->interface->name,
 			   neigh->upstream_jp_agg->count);

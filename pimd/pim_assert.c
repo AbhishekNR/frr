@@ -309,8 +309,8 @@ int pim_assert_recv(struct interface *ifp, struct pim_neighbor *neigh,
 	assert(pim_ifp);
 	++pim_ifp->pim_ifstat_assert_recv;
 
-	return dispatch_assert(ifp, msg_source_addr.u.prefix4, sg.grp.ipaddr_v4,
-			       msg_metric);
+	return dispatch_assert(ifp, msg_source_addr.u.prefix4,
+			       sg.grp.ipaddr_v4, msg_metric);
 }
 
 /*

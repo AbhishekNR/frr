@@ -2818,7 +2818,7 @@ int lib_interface_igmp_address_family_static_group_destroy(
 		yang_dnode_get_ip(&group_addr, args->dnode, "./group-addr");
 
 		result = pim_if_igmp_join_del(ifp, group_addr.ipaddr_v4,
-					      source_addr.ipaddr_v4);
+				source_addr.ipaddr_v4);
 
 		if (result) {
 			char src_str[INET_ADDRSTRLEN];

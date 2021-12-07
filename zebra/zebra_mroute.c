@@ -47,10 +47,8 @@ void zebra_ipmr_route_stats(ZAPI_HANDLER_ARGS)
 		char sbuf[40];
 		char gbuf[40];
 
-		inet_ntop(AF_INET, &mroute.sg.src.ipaddr_v4, sbuf,
-			  sizeof(sbuf));
-		inet_ntop(AF_INET, &mroute.sg.grp.ipaddr_v4, gbuf,
-			  sizeof(gbuf));
+		inet_ntop(AF_INET, &mroute.sg.src.ipaddr_v4, sbuf, sizeof(sbuf));
+		inet_ntop(AF_INET, &mroute.sg.grp.ipaddr_v4, gbuf, sizeof(gbuf));
 
 		zlog_debug("Asking for (%s,%s)[%s(%u)] mroute information",
 			   sbuf, gbuf, zvrf->vrf->name, zvrf->vrf->vrf_id);

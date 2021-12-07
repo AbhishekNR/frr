@@ -1083,8 +1083,8 @@ static int netlink_route_change_read_multicast(struct nlmsghdr *h,
 		zlog_debug(
 			"MCAST VRF: %s(%d) %s (%pI4,%pI4) IIF: %s(%d) OIF: %s jiffies: %lld",
 			zvrf_name(zvrf), vrf, nl_msg_type_to_str(h->nlmsg_type),
-			&m->sg.src.ipaddr_v4, &m->sg.grp.ipaddr_v4,
-			ifp ? ifp->name : "Unknown", iif, oif_list,
+			&m->sg.src.ipaddr_v4, &m->sg.grp.ipaddr_v4, ifp ? ifp->name : "Unknown",
+			iif, oif_list,
 			m->lastused);
 	}
 	return 0;
@@ -2247,10 +2247,8 @@ int kernel_get_ipmr_sg_stats(struct zebra_vrf *zvrf, void *in)
 
 	nl_attr_put32(&req.n, sizeof(req), RTA_IIF, mroute->ifindex);
 	nl_attr_put32(&req.n, sizeof(req), RTA_OIF, mroute->ifindex);
-	nl_attr_put32(&req.n, sizeof(req), RTA_SRC,
-		      mroute->sg.src.ipaddr_v4.s_addr);
-	nl_attr_put32(&req.n, sizeof(req), RTA_DST,
-		      mroute->sg.grp.ipaddr_v4.s_addr);
+	nl_attr_put32(&req.n, sizeof(req), RTA_SRC, mroute->sg.src.ipaddr_v4.s_addr);
+	nl_attr_put32(&req.n, sizeof(req), RTA_DST, mroute->sg.grp.ipaddr_v4.s_addr);
 	/*
 	 * What?
 	 *

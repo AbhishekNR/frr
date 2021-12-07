@@ -662,7 +662,8 @@ static void pim_msdp_up_xg_del(struct pim_instance *pim, struct prefix_sg *sg)
 	/* XXX: Need to maintain SAs per-group to avoid all this unnecessary
 	 * walking */
 	for (ALL_LIST_ELEMENTS_RO(pim->msdp.sa_list, sanode, sa)) {
-		if (sa->sg.grp.ipaddr_v4.s_addr != sg->grp.ipaddr_v4.s_addr) {
+		if (sa->sg.grp.ipaddr_v4.s_addr
+		    != sg->grp.ipaddr_v4.s_addr) {
 			continue;
 		}
 		pim_msdp_sa_upstream_update(sa, NULL /* xg */, "up-jp-change");
@@ -695,7 +696,8 @@ static bool pim_msdp_sa_hash_eq(const void *p1, const void *p2)
 	const struct pim_msdp_sa *sa1 = p1;
 	const struct pim_msdp_sa *sa2 = p2;
 
-	return ((sa1->sg.src.ipaddr_v4.s_addr == sa2->sg.src.ipaddr_v4.s_addr)
+	return ((sa1->sg.src.ipaddr_v4.s_addr
+		 == sa2->sg.src.ipaddr_v4.s_addr)
 		&& (sa1->sg.grp.ipaddr_v4.s_addr
 		    == sa2->sg.grp.ipaddr_v4.s_addr));
 }

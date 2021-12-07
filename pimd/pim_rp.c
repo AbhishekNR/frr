@@ -368,7 +368,8 @@ void pim_upstream_update(struct pim_instance *pim, struct pim_upstream *up)
 	struct prefix nht_p;
 
 	old_upstream_addr = up->upstream_addr;
-	pim_rp_set_upstream_addr(pim, &new_upstream_addr, up->sg.src.ipaddr_v4,
+	pim_rp_set_upstream_addr(pim, &new_upstream_addr,
+				 up->sg.src.ipaddr_v4,
 				 up->sg.grp.ipaddr_v4);
 
 	if (PIM_DEBUG_PIM_TRACE)
@@ -538,8 +539,7 @@ int pim_rp_new(struct pim_instance *pim, struct in_addr rp_addr,
 				 * configured yet
 				 */
 				if ((up->upstream_addr.s_addr == INADDR_ANY)
-				    && (up->sg.src.ipaddr_v4.s_addr
-					== INADDR_ANY)) {
+				    && (up->sg.src.ipaddr_v4.s_addr == INADDR_ANY)) {
 					struct prefix grp;
 					struct rp_info *trp_info;
 
@@ -842,10 +842,9 @@ int pim_rp_del(struct pim_instance *pim, struct in_addr rp_addr,
 			/* RP not found for the group grp */
 			if (pim_rpf_addr_is_inaddr_none(&trp_info->rp)) {
 				pim_upstream_rpf_clear(pim, up);
-				pim_rp_set_upstream_addr(pim,
-							 &up->upstream_addr,
-							 up->sg.src.ipaddr_v4,
-							 up->sg.grp.ipaddr_v4);
+				pim_rp_set_upstream_addr(
+					pim, &up->upstream_addr, up->sg.src.ipaddr_v4,
+					up->sg.grp.ipaddr_v4);
 			}
 
 			/* RP found for the group grp */

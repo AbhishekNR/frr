@@ -1773,12 +1773,10 @@ static void pim_show_join(struct pim_instance *pim, struct vty *vty,
 
 		RB_FOREACH (ch, pim_ifchannel_rb, &pim_ifp->ifchannel_rb) {
 			if (sg->grp.ipaddr_v4.s_addr != INADDR_ANY
-			    && sg->grp.ipaddr_v4.s_addr
-				       != ch->sg.grp.ipaddr_v4.s_addr)
+			    && sg->grp.ipaddr_v4.s_addr != ch->sg.grp.ipaddr_v4.s_addr)
 				continue;
 			if (sg->src.ipaddr_v4.s_addr != INADDR_ANY
-			    && sg->src.ipaddr_v4.s_addr
-				       != ch->sg.src.ipaddr_v4.s_addr)
+			    && sg->src.ipaddr_v4.s_addr != ch->sg.src.ipaddr_v4.s_addr)
 				continue;
 			pim_show_join_helper(vty, pim_ifp, ch, json, now, uj);
 		} /* scan interface channels */
@@ -2483,10 +2481,8 @@ static void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
 		    && sg->src.ipaddr_v4.s_addr != up->sg.src.ipaddr_v4.s_addr)
 			continue;
 
-		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str,
-			       sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str,
-			       sizeof(grp_str));
+		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 		pim_time_uptime(uptime, sizeof(uptime),
 				now - up->state_transition);
 		pim_time_timer_to_hhmmss(join_timer, sizeof(join_timer),
@@ -2713,10 +2709,8 @@ static void pim_show_join_desired_helper(struct pim_instance *pim,
 	char grp_str[INET_ADDRSTRLEN];
 	json_object *json_row = NULL;
 
-	pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str,
-		       sizeof(src_str));
-	pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str,
-		       sizeof(grp_str));
+	pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+	pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 
 	if (uj) {
 		json_object_object_get_ex(json, grp_str, &json_group);
@@ -4696,10 +4690,8 @@ static void pim_show_jp_agg_helper(struct vty *vty,
 	char grp_str[INET_ADDRSTRLEN];
 	char rpf_str[INET_ADDRSTRLEN];
 
-	pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str,
-		       sizeof(src_str));
-	pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str,
-		       sizeof(grp_str));
+	pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+	pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 	/* pius->address.s_addr */
 	pim_inet4_dump("<rpf?>", neigh->source_addr, rpf_str, sizeof(rpf_str));
 
@@ -4881,10 +4873,8 @@ static void pim_show_mlag_up_detail(struct vrf *vrf,
 		    && !pim_up_mlag_is_local(up))
 			continue;
 
-		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str,
-			       sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str,
-			       sizeof(grp_str));
+		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 		/* XXX: strcmps are clearly inefficient. we should do uint comps
 		 * here instead.
 		 */
@@ -4930,10 +4920,8 @@ static void pim_show_mlag_up_vrf(struct vrf *vrf, struct vty *vty, bool uj)
 		    && !(up->flags & PIM_UPSTREAM_FLAG_MASK_MLAG_INTERFACE)
 		    && !pim_up_mlag_is_local(up))
 			continue;
-		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str,
-			       sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str,
-			       sizeof(grp_str));
+		pim_inet4_dump("<src?>", up->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", up->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 		if (uj) {
 			json_object *own_list = NULL;
 
@@ -5957,12 +5945,10 @@ static void show_mroute(struct pim_instance *pim, struct vty *vty,
 			continue;
 
 		if (sg->grp.ipaddr_v4.s_addr != INADDR_ANY
-		    && sg->grp.ipaddr_v4.s_addr
-			       != c_oil->oil.mfcc_mcastgrp.s_addr)
+		    && sg->grp.ipaddr_v4.s_addr != c_oil->oil.mfcc_mcastgrp.s_addr)
 			continue;
 		if (sg->src.ipaddr_v4.s_addr != INADDR_ANY
-		    && sg->src.ipaddr_v4.s_addr
-			       != c_oil->oil.mfcc_origin.s_addr)
+		    && sg->src.ipaddr_v4.s_addr != c_oil->oil.mfcc_origin.s_addr)
 			continue;
 
 		pim_inet4_dump("<group?>", c_oil->oil.mfcc_mcastgrp, grp_str,
@@ -10526,15 +10512,12 @@ static void pim_show_vxlan_sg_entry(struct pim_vxlan_sg *vxlan_sg,
 	else
 		oif_name = vxlan_sg->term_oif?vxlan_sg->term_oif->name:"";
 
-	if (cwd->addr_match
-	    && (vxlan_sg->sg.src.ipaddr_v4.s_addr != cwd->addr.s_addr)
-	    && (vxlan_sg->sg.grp.ipaddr_v4.s_addr != cwd->addr.s_addr)) {
+	if (cwd->addr_match && (vxlan_sg->sg.src.ipaddr_v4.s_addr != cwd->addr.s_addr) &&
+	    (vxlan_sg->sg.grp.ipaddr_v4.s_addr != cwd->addr.s_addr)) {
 		return;
 	}
-	pim_inet4_dump("<src?>", vxlan_sg->sg.src.ipaddr_v4, src_str,
-		       sizeof(src_str));
-	pim_inet4_dump("<grp?>", vxlan_sg->sg.grp.ipaddr_v4, grp_str,
-		       sizeof(grp_str));
+	pim_inet4_dump("<src?>", vxlan_sg->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+	pim_inet4_dump("<grp?>", vxlan_sg->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 	if (json) {
 		json_object_object_get_ex(json, grp_str, &cwd->json_group);
 

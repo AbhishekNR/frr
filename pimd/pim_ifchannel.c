@@ -167,9 +167,9 @@ void pim_ifchannel_delete(struct pim_ifchannel *ch)
 		 * being inherited.  So let's figure out what
 		 * needs to be done here
 		 */
-		if ((ch->sg.src.ipaddr_v4.s_addr != INADDR_ANY)
-		    && pim_upstream_evaluate_join_desired_interface(
-			       ch->upstream, ch, ch->parent))
+		if ((ch->sg.src.ipaddr_v4.s_addr != INADDR_ANY) &&
+				pim_upstream_evaluate_join_desired_interface(
+					ch->upstream, ch, ch->parent))
 			pim_channel_add_oif(ch->upstream->channel_oil,
 					ch->interface,
 					PIM_OIF_FLAG_PROTO_STAR,
@@ -1362,10 +1362,8 @@ void pim_ifchannel_update_could_assert(struct pim_ifchannel *ch)
 	if (PIM_DEBUG_PIM_EVENTS) {
 		char src_str[INET_ADDRSTRLEN];
 		char grp_str[INET_ADDRSTRLEN];
-		pim_inet4_dump("<src?>", ch->sg.src.ipaddr_v4, src_str,
-			       sizeof(src_str));
-		pim_inet4_dump("<grp?>", ch->sg.grp.ipaddr_v4, grp_str,
-			       sizeof(grp_str));
+		pim_inet4_dump("<src?>", ch->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 		zlog_debug("%s: CouldAssert(%s,%s,%s) changed from %d to %d",
 			   __func__, src_str, grp_str, ch->interface->name,
 			   old_couldassert, new_couldassert);
@@ -1447,10 +1445,8 @@ void pim_ifchannel_update_assert_tracking_desired(struct pim_ifchannel *ch)
 	if (PIM_DEBUG_PIM_EVENTS) {
 		char src_str[INET_ADDRSTRLEN];
 		char grp_str[INET_ADDRSTRLEN];
-		pim_inet4_dump("<src?>", ch->sg.src.ipaddr_v4, src_str,
-			       sizeof(src_str));
-		pim_inet4_dump("<grp?>", ch->sg.grp.ipaddr_v4, grp_str,
-			       sizeof(grp_str));
+		pim_inet4_dump("<src?>", ch->sg.src.ipaddr_v4, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->sg.grp.ipaddr_v4, grp_str, sizeof(grp_str));
 		zlog_debug(
 			"%s: AssertTrackingDesired(%s,%s,%s) changed from %d to %d",
 			__func__, src_str, grp_str, ch->interface->name,
