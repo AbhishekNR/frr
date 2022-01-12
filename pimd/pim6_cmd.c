@@ -104,6 +104,77 @@ DEFUN (show_ipv6_mld_groups_vrf_all,
     return CMD_SUCCESS;
 }
 
+DEFUN (show_ipv6_mld_interface,
+       show_ipv6_mld_interface_cmd,
+       "show ipv6 mld [vrf NAME] interface [detail|WORD] [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       "MLD interface information\n"
+       "Detailed output\n"
+       "interface name\n"
+       JSON_STR)
+{
+    int idx = 2;
+    struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+    bool uj = use_json(argc, argv);
+
+    if (!vrf)
+        return CMD_WARNING;
+
+    if (argv_find(argv, argc, "detail", &idx)
+        || argv_find(argv, argc, "WORD", &idx))
+        //To be done
+        //mld_show_interfaces_single()
+    else
+        //To be done
+        //mld_show_interfaces()
+
+    return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mld_interface_vrf_all,
+       show_ipv6_mld_interface_vrf_all_cmd,
+       "show ipv6 mld vrf all interface [detail|WORD] [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       "MLD interface information\n"
+       "Detailed output\n"
+       "interface name\n"
+       JSON_STR)
+{
+    int idx = 2;
+    bool uj = use_json(argc, argv);
+    struct vrf *vrf;
+    bool first = true;
+
+    if (uj)
+        vty_out(vty, "{ ");
+    RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+        if (uj) {
+            if (!first)
+                vty_out(vty, ", ");
+            vty_out(vty, " \"%s\": ", vrf->name);
+            first = false;
+        } else
+            vty_out(vty, "VRF: %s\n", vrf->name);
+        if (argv_find(argv, argc, "detail", &idx)
+            || argv_find(argv, argc, "WORD", &idx))
+            //To be done
+            //mld_show_interfaces_single()
+        else
+            //To be done
+            //mld_show_interfaces()
+    }
+    if (uj)
+        vty_out(vty, "}\n");
+
+    return CMD_SUCCESS;
+}
+
 void pim6_cmd_init(void)
 {
     if_cmd_init(pim_interface_config_write);
@@ -112,4 +183,6 @@ void pim6_cmd_init(void)
 
     install_element(VIEW_NODE, &show_ipv6_mld_groups_cmd);
     install_element(VIEW_NODE, &show_ipv6_mld_groups_vrf_all_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mld_interface_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mld_interface_vrf_all_cmd);
 }
