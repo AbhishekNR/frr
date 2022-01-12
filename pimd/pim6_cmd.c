@@ -204,6 +204,126 @@ DEFUN (show_ipv6_mld_statistics,
     return CMD_SUCCESS;
 }
 
+DEFPY (show_ipv6_mroute,
+      show_ipv6_mroute_cmd,
+      "show ipv6 mroute [vrf NAME] [A.B.C.D$s_or_g [A.B.C.D$g]] [fill$fill] [json$json]",
+      SHOW_STR
+      IPV6_STR
+      MROUTE_STR
+      VRF_CMD_HELP_STR
+      "The Source or Group\n"
+      "The Group\n"
+      "Fill in Assumed data\n"
+      JSON_STR)
+{
+	struct prefix_sg sg = {0};
+	struct pim_instance *pim;
+	struct vrf *v;
+	v = vrf_lookup_by_name(vrf ? vrf : VRF_DEFAULT_NAME);
+	if (!v) {
+		vty_out(vty, "%% Vrf specified: %s does not exist\n", vrf);
+		return CMD_WARNING;
+	}
+	pim = pim_get_pim_instance(v->vrf_id);
+	if (!pim) {
+		vty_out(vty, "%% Unable to find pim instance\n");
+		return CMD_WARNING;
+	}
+	if (s_or_g.s_addr != in6addr_any) {
+		if (g.s_addr != in6addr_any) {
+			sg.src = s_or_g;
+			sg.grp = g;
+		} else
+			sg.grp = s_or_g;
+	}
+	show_mroute(pim, vty, &sg, !!fill, !!json);
+	return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mroute_vrf_all,
+      show_ipv6_mroute_vrf_all_cmd,
+      "show ipv6 mroute vrf all [fill] [json]",
+      SHOW_STR
+      IPV6_STR
+      MROUTE_STR
+      VRF_CMD_HELP_STR
+      "Fill in Assumed data\n"
+      JSON_STR)
+{
+	struct prefix_sg sg = {0};
+	bool uj = use_json(argc, argv);
+	int idx = 4;
+	struct vrf *vrf;
+	bool first = true;
+	bool fill = false;
+	if (argv_find(argv, argc, "fill", &idx))
+		fill = true;
+	if (uj)
+		vty_out(vty, "{ ");
+	RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+		if (uj) {
+			if (!first)
+				vty_out(vty, ", ");
+			vty_out(vty, " \"%s\": ", vrf->name);
+			first = false;
+		} else
+			vty_out(vty, "VRF: %s\n", vrf->name);
+		show_mroute(vrf->info, vty, &sg, fill, uj);
+	}
+	if (uj)
+		vty_out(vty, "}\n");
+	return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mroute_count,
+      show_ipv6_mroute_count_cmd,
+      "show ipv6 mroute [vrf NAME] count [json]",
+      SHOW_STR
+      IPV6_STR
+      MROUTE_STR
+      VRF_CMD_HELP_STR
+      "Route and packet count data\n"
+      JSON_STR)
+{
+	int idx = 2;
+	bool uj = use_json(argc, argv);
+	struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+	if (!vrf)
+		return CMD_WARNING;
+	show_mroute_count(vrf->info, vty, uj);
+	return CMD_SUCCESS;
+	}
+
+DEFUN (show_ipv6_mroute_count_vrf_all,
+      show_ipv6_mroute_count_vrf_all_cmd,
+      "show ipv6 mroute vrf all count [json]",
+      SHOW_STR
+      IPV6_STR
+      MROUTE_STR
+      VRF_CMD_HELP_STR
+      "Route and packet count data\n"
+      JSON_STR)
+{
+	bool uj = use_json(argc, argv);
+	struct vrf *vrf;
+	bool first = true;
+	if (uj)
+		vty_out(vty, "{ ");
+	RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+		if (uj) {
+			if (!first)
+				vty_out(vty, ", ");
+			vty_out(vty, " \"%s\": ", vrf->name);
+			first = false;
+		} else
+			vty_out(vty, "VRF: %s\n", vrf->name);
+		show_mroute_count(vrf->info, vty, uj);
+	}
+	if (uj)
+		vty_out(vty, "}\n");
+	return CMD_SUCCESS;
+}
+
 void pim6_cmd_init(void)
 {
     if_cmd_init(pim_interface_config_write);
@@ -215,4 +335,8 @@ void pim6_cmd_init(void)
     install_element(VIEW_NODE, &show_ipv6_mld_interface_cmd);
     install_element(VIEW_NODE, &show_ipv6_mld_interface_vrf_all_cmd);
     install_element(VIEW_NODE, &show_ipv6_mld_statistics_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_vrf_all_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_count_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_count_vrf_all_cmd);
 }
