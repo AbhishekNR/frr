@@ -324,6 +324,78 @@ DEFUN (show_ipv6_mroute_count_vrf_all,
 	return CMD_SUCCESS;
 }
 
+DEFUN (show_ipv6_mroute_summary,
+       show_ipv6_mroute_summary_cmd,
+       "show ipv6 mroute [vrf NAME] summary [json]",
+       SHOW_STR
+       IPV6_STR
+       MROUTE_STR
+       VRF_CMD_HELP_STR
+       "Summary of all mroutes\n"
+       JSON_STR)
+{
+	int idx = 2;
+	bool uj = use_json(argc, argv);
+	struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+	json_object *json = NULL;
+
+	if (uj)
+		json = json_object_new_object();
+
+	if (!vrf)
+		return CMD_WARNING;
+
+	show_mroute_summary(vrf->info, vty, json);
+
+	if (uj) {
+		vty_out(vty, "%s\n",
+			json_object_to_json_string_ext(
+				json, JSON_C_TO_STRING_PRETTY));
+		json_object_free(json);
+	}
+	return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mroute_summary_vrf_all,
+       show_ipv6_mroute_summary_vrf_all_cmd,
+       "show ip mroute vrf all summary [json]",
+       SHOW_STR
+       IPV6_STR
+       MROUTE_STR
+       VRF_CMD_HELP_STR
+       "Summary of all mroutes\n"
+       JSON_STR)
+{
+	struct vrf *vrf;
+	bool uj = use_json(argc, argv);
+	json_object *json = NULL;
+	json_object *json_vrf = NULL;
+
+	if (uj)
+		json = json_object_new_object();
+
+	RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+		if (uj)
+			json_vrf = json_object_new_object();
+		else
+			vty_out(vty, "VRF: %s\n", vrf->name);
+
+		show_mroute_summary(vrf->info, vty, json_vrf);
+
+		if (uj)
+			json_object_object_add(json, vrf->name, json_vrf);
+	}
+
+	if (uj) {
+		vty_out(vty, "%s\n",
+			json_object_to_json_string_ext(
+				json, JSON_C_TO_STRING_PRETTY));
+		json_object_free(json);
+	}
+
+	return CMD_SUCCESS;
+}
+
 void pim6_cmd_init(void)
 {
     if_cmd_init(pim_interface_config_write);
@@ -339,4 +411,6 @@ void pim6_cmd_init(void)
     install_element(VIEW_NODE, &show_ipv6_mroute_vrf_all_cmd);
     install_element(VIEW_NODE, &show_ipv6_mroute_count_cmd);
     install_element(VIEW_NODE, &show_ipv6_mroute_count_vrf_all_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_summary_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mroute_summary_vrf_all_cmd);
 }
