@@ -48,9 +48,68 @@ static struct cmd_node debug_node = {
 	.config_write = pim_debug_config_write,
 };
 
+DEFUN (show_ipv6_mld_groups,
+       show_ipv6_mld_groups_cmd,
+       "show ipv6 mld [vrf NAME] groups [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       MLD_GROUP_STR
+       JSON_STR)
+{
+    int idx = 2;
+    struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+    bool uj = use_json(argc, argv);
+
+    if (!vrf)
+        return CMD_WARNING;
+
+    //To be done
+    //mld_show_groups()
+
+    return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mld_groups_vrf_all,
+       show_ipv6_mld_groups_vrf_all_cmd,
+       "show ipv6 mld vrf all groups [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       MLD_GROUP_STR
+       JSON_STR)
+{
+    bool uj = use_json(argc, argv);
+    struct vrf *vrf;
+    bool first = true;
+
+    if (uj)
+        vty_out(vty, "{ ");
+    RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+        if (uj) {
+            if (!first)
+                vty_out(vty, ", ");
+            vty_out(vty, " \"%s\": ", vrf->name);
+            first = false;
+        } else
+            vty_out(vty, "VRF: %s\n", vrf->name);
+        //To be done
+        //mld_show_groups()
+    }
+    if (uj)
+        vty_out(vty, "}\n");
+
+    return CMD_SUCCESS;
+}
+
 void pim6_cmd_init(void)
 {
-	if_cmd_init(pim_interface_config_write);
+    if_cmd_init(pim_interface_config_write);
 
-	install_node(&debug_node);
+    install_node(&debug_node);
+
+    install_element(VIEW_NODE, &show_ipv6_mld_groups_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mld_groups_vrf_all_cmd);
 }
