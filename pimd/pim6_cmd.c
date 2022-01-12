@@ -175,6 +175,35 @@ DEFUN (show_ipv6_mld_interface_vrf_all,
     return CMD_SUCCESS;
 }
 
+DEFUN (show_ipv6_mld_statistics,
+       show_ipv6_mld_statistics_cmd,
+       "show ipv6 mld [vrf NAME] statistics [interface WORD] [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       "MLD statistics\n"
+       "interface\n"
+       "MLD interface\n"
+       JSON_STR)
+{
+    int idx = 2;
+    struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+    bool uj = use_json(argc, argv);
+
+    if (!vrf)
+        return CMD_WARNING;
+
+    if (argv_find(argv, argc, "WORD", &idx))
+        //To be done
+        //mld_show_statistics()
+    else
+        //To be done
+        //mld_show_statistics()
+
+    return CMD_SUCCESS;
+}
+
 void pim6_cmd_init(void)
 {
     if_cmd_init(pim_interface_config_write);
@@ -185,4 +214,5 @@ void pim6_cmd_init(void)
     install_element(VIEW_NODE, &show_ipv6_mld_groups_vrf_all_cmd);
     install_element(VIEW_NODE, &show_ipv6_mld_interface_cmd);
     install_element(VIEW_NODE, &show_ipv6_mld_interface_vrf_all_cmd);
+    install_element(VIEW_NODE, &show_ipv6_mld_statistics_cmd);
 }
