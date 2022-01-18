@@ -2645,7 +2645,11 @@ int lib_interface_igmp_query_interval_modify(struct nb_cb_modify_args *args)
 	case NB_EV_APPLY:
 		ifp = nb_running_get_entry(args->dnode, NULL, true);
 		query_interval = yang_dnode_get_uint16(args->dnode, NULL);
+#if PIM_IPV == 4
 		change_query_interval(ifp->info, query_interval);
+#else
+		/* TBD Depends on MLD data structure changes */
+#endif
 	}
 
 	return NB_OK;
