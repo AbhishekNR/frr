@@ -2541,6 +2541,8 @@ int lib_interface_igmp_igmp_enable_modify(struct nb_cb_modify_args *args)
 		break;
 	case NB_EV_APPLY:
 		ifp = nb_running_get_entry(args->dnode, NULL, true);
+
+#if PIM_IPV == 4
 		igmp_enable = yang_dnode_get_bool(args->dnode, NULL);
 
 		if (igmp_enable)
@@ -2561,6 +2563,10 @@ int lib_interface_igmp_igmp_enable_modify(struct nb_cb_modify_args *args)
 			if (!PIM_IF_TEST_PIM(pim_ifp->options))
 				pim_if_delete(ifp);
 		}
+#else
+		/* TBD Depends on MLD data structure changes */
+
+#endif
 	}
 
 	return NB_OK;
