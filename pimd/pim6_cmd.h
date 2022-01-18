@@ -19,34 +19,28 @@
  */
 #ifndef PIM6_CMD_H
 #define PIM6_CMD_H
-#define PIM_STR "PIM information\n"
-#define MLD_STR "MLD information\n"
-#define MLD_GROUP_STR "MLD groups information\n"
-#define MLD_SOURCE_STR "MLD sources information\n"
-#define IFACE_MLD_STR  "Enable MLD operation\n"
-#define IFACE_MLD_QUERY_INTERVAL_STR "MLD host query interval\n"
-#define IFACE_MLD_QUERY_MAX_RESPONSE_TIME_STR \
-	"MLD max query response value (seconds)\n"
-#define IFACE_MLD_QUERY_MAX_RESPONSE_TIME_DSEC_STR \
-	"MLD max query response value (deciseconds)\n"
-#define IFACE_MLD_LAST_MEMBER_QUERY_INTERVAL_STR \
-	"MLD last member query interval\n"
-#define IFACE_MLD_LAST_MEMBER_QUERY_COUNT_STR "MLD last member query count\n"
-#define MROUTE_STR "IP multicast routing table\n"
-#define DEBUG_MLD_STR "MLD protocol activity\n"
-#define DEBUG_MLD_EVENTS_STR "MLD protocol events\n"
-#define DEBUG_MLD_PACKETS_STR "MLD protocol packets\n"
-#define DEBUG_MLD_TRACE_STR "MLD internal daemon activity\n"
-
+#define PIM_STR                                "PIM information\n"
+#define MLD_STR                                "MLD information\n"
+#define MLD_GROUP_STR                          "MLD groups information\n"
+#define MLD_SOURCE_STR                         "MLD sources information\n"
+#define IFACE_MLD_STR                          "Enable MLD operation\n"
+#define IFACE_MLD_QUERY_INTERVAL_STR           "MLD host query interval\n"
+#define IFACE_MLD_QUERY_MAX_RESPONSE_TIME_STR       "MLD max query response value (seconds)\n"
+#define IFACE_MLD_QUERY_MAX_RESPONSE_TIME_DSEC_STR  "MLD max query response value (deciseconds)\n"
+#define IFACE_MLD_LAST_MEMBER_QUERY_INTERVAL_STR    "MLD last member query interval\n"
+#define IFACE_MLD_LAST_MEMBER_QUERY_COUNT_STR       "MLD last member query count\n"
+#define MROUTE_STR                                  "IP multicast routing table\n"
+#define DEBUG_MLD_STR                               "MLD protocol activity\n"
+#define DEBUG_MLD_EVENTS_STR                        "MLD protocol events\n"
+#define DEBUG_MLD_PACKETS_STR                       "MLD protocol packets\n"
+#define DEBUG_MLD_TRACE_STR                         "MLD internal daemon activity\n"
 void pim_cmd_init(void);
 /*
  * Special Macro to allow us to get the correct pim_instance;
  */
-#define PIM_DECLVAR_CONTEXT(A, B) \
-	do { \
-		struct vrf *A = VTY_GET_CONTEXT(vrf); \
-		struct pim_instance *B = \
-			(vrf) ? vrf->info : pim_get_pim_instance(VRF_DEFAULT); \
-		vrf = (vrf) ? vrf : pim->vrf; \
-	} while (0)
+#define PIM_DECLVAR_CONTEXT(A, B)                                              \
+	struct vrf *A = VTY_GET_CONTEXT(vrf);                                  \
+	struct pim_instance *B =                                               \
+		(vrf) ? vrf->info : pim_get_pim_instance(VRF_DEFAULT);         \
+	vrf = (vrf) ? vrf : pim->vrf
 #endif /* PIM6_CMD_H */
