@@ -156,6 +156,38 @@ DEFUN(interface_no_ipv6_mld_join, interface_no_ipv6_mld_join_cmd,
 	return nb_cli_apply_changes(vty, NULL);
 }
 
+DEFUN(interface_ipv6_mld_version,
+      interface_ipv6_mld_version_cmd,
+      "ipv6 mld version (1-2)",
+      IPV6_STR
+      IFACE_MLD_STR
+      "MLD version\n"
+      "MLD version number\n")
+{
+	nb_cli_enqueue_change(vty, "./enable", NB_OP_MODIFY, "true");
+	/* TBD
+	 * nb_cli_enqueue_change(vty, "./mld-version", NB_OP_MODIFY,
+	 * argv[3]->arg); return nb_cli_apply_changes(vty,
+	 * FRR_GMP_INTERFACE_XPATH, "frr-routing:ipv6");
+	 */
+}
+
+DEFUN(interface_no_ipv6_mld_version,
+      interface_no_ipv6_mld_version_cmd,
+      "no ipv6 mld version (1-2)",
+      NO_STR
+      IPV6_STR
+      IFACE_MLD_STR
+      "MLD version\n"
+      "MLD version number\n")
+{
+	/* TBD
+	 * nb_cli_enqueue_change(vty, "./mld-version", NB_OP_DESTROY, NULL);
+	 * return nb_cli_apply_changes(vty, FRR_GMP_INTERFACE_XPATH,
+	 *			    "frr-routing:ipv6");
+	 */
+}
+
 void pim6_cmd_init(void)
 {
 	if_cmd_init(pim_interface_config_write);
@@ -164,4 +196,6 @@ void pim6_cmd_init(void)
 	install_element(INTERFACE_NODE, &interface_no_ipv6_mld_cmd);
 	install_element(INTERFACE_NODE, &interface_ipv6_mld_join_cmd);
 	install_element(INTERFACE_NODE, &interface_no_ipv6_mld_join_cmd);
+	install_element(INTERFACE_NODE, &interface_ipv6_mld_version_cmd);
+	install_element(INTERFACE_NODE, &interface_no_ipv6_mld_version_cmd);
 }
