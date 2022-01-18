@@ -6,7 +6,10 @@ if PIMD
 sbin_PROGRAMS += pimd/pimd
 bin_PROGRAMS += pimd/mtracebis
 noinst_PROGRAMS += pimd/test_igmpv3_join
-vtysh_scan += pimd/pim_cmd.c
+vtysh_scan += \
+	pimd/pim_cmd.c \
+	pimd/pim6_cmd.c \
+	#end
 vtysh_daemons += pimd
 man8 += $(MANBUILD)/frr-pimd.8
 man8 += $(MANBUILD)/mtracebis.8
@@ -74,12 +77,22 @@ nodist_pimd_pimd_SOURCES = \
 	yang/frr-igmp.yang.c \
 	# end
 
+pimd_pim6d_SOURCES = \
+	$(pim_common) \
+	pimd/pim6_main.c \
+	pimd/pim6_cmd.c \
+	# end
+
+nodist_pimd_pim6d_SOURCES = \
+	# end
+
 noinst_HEADERS += \
 	pimd/pim_assert.h \
 	pimd/pim_bfd.h \
 	pimd/pim_br.h \
 	pimd/pim_bsm.h \
 	pimd/pim_cmd.h \
+	pimd/pim6_cmd.h \
 	pimd/pim_errors.h \
 	pimd/pim_hello.h \
 	pimd/pim_iface.h \
@@ -132,6 +145,7 @@ noinst_HEADERS += \
 
 clippy_scan += \
 	pimd/pim_cmd.c \
+	pimd/pim6_cmd.c \
 	# end
 
 pimd_pimd_LDADD = lib/libfrr.la $(LIBCAP)
