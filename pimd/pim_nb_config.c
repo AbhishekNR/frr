@@ -2788,13 +2788,18 @@ int lib_interface_igmp_address_family_static_group_create(
 		yang_dnode_get_ip(&source_addr, args->dnode, "./source-addr");
 		yang_dnode_get_ip(&group_addr, args->dnode, "./group-addr");
 
+#if PIM_IPV == 4
 		result = pim_if_igmp_join_add(ifp, group_addr.ip._v4_addr,
-				source_addr.ip._v4_addr);
+					      source_addr.ip._v4_addr);
 		if (result) {
 			snprintf(args->errmsg, args->errmsg_len,
 				 "Failure joining IGMP group");
 			return NB_ERR_INCONSISTENCY;
 		}
+#else
+		/* TBD Depends on MLD data structure changes */
+
+#endif
 	}
 
 	return NB_OK;
