@@ -42,7 +42,81 @@
 #include "pimd/pim6_cmd_clippy.c"
 #endif
 
+DEFUN (show_ipv6_mld_groups,
+       show_ipv6_mld_groups_cmd,
+       "show ipv6 mld [vrf NAME] groups [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       MLD_GROUP_STR
+       JSON_STR)
+{
+	int idx = 2;
+	struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+	bool uj = use_json(argc, argv);
+	json_object *json = NULL;
+
+	if (uj)
+		json = json_object_new_object();
+
+	if (!vrf)
+		return CMD_WARNING;
+
+	/* 
+	 * TBD Depends on MLD data structure changes
+	 * mld_show_groups(vrf->info, vty, uj, json)
+	 */
+
+	if (uj) {
+		vty_json(vty, json);
+		json_object_free(json);
+	}
+
+	return CMD_SUCCESS;
+}
+
+DEFUN (show_ipv6_mld_groups_vrf_all,
+       show_ipv6_mld_groups_vrf_all_cmd,
+       "show ipv6 mld vrf all groups [json]",
+       SHOW_STR
+       IPV6_STR
+       MLD_STR
+       VRF_CMD_HELP_STR
+       MLD_GROUP_STR
+       JSON_STR)
+{
+	bool uj = use_json(argc, argv);
+	struct vrf *vrf;
+	json_object *json = NULL;
+	json_object *json_vrf = NULL;
+
+	if (uj)
+		json = json_object_new_object();
+
+	RB_FOREACH (vrf, vrf_name_head, &vrfs_by_name) {
+		if (!uj)
+			vty_out(vty, "VRF: %s\n", vrf->name);
+		else
+			json_vrf = json_object_new_object();
+		/* 
+		 * TBD Depends on MLD data structure changes
+		 * mld_show_groups(vrf->info, vty, uj, json_vrf)
+		 */
+		if (uj)
+			json_object_object_add(json, vrf->name, json_vrf);
+	}
+	if (uj) {
+		vty_json(vty, json);
+		json_object_free(json);
+	}
+
+	return CMD_SUCCESS;
+}
+
 void pim_cmd_init(void)
 {
 	if_cmd_init(pim_interface_config_write);
+	install_element(VIEW_NODE, &show_ipv6_mld_groups_cmd);
+	install_element(VIEW_NODE, &show_ipv6_mld_groups_vrf_all_cmd);
 }
