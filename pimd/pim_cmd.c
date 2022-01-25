@@ -79,23 +79,6 @@ static struct cmd_node debug_node = {
 	.config_write = pim_debug_config_write,
 };
 
-static struct vrf *pim_cmd_lookup_vrf(struct vty *vty, struct cmd_token *argv[],
-				      const int argc, int *idx)
-{
-	struct vrf *vrf;
-
-	if (argv_find(argv, argc, "NAME", idx))
-		vrf = vrf_lookup_by_name(argv[*idx]->arg);
-	else
-		vrf = vrf_lookup_by_id(VRF_DEFAULT);
-
-	if (!vrf)
-		vty_out(vty, "Specified VRF: %s does not exist\n",
-			argv[*idx]->arg);
-
-	return vrf;
-}
-
 static void pim_show_assert_helper(struct vty *vty,
 				   struct pim_interface *pim_ifp,
 				   struct pim_ifchannel *ch, time_t now)
