@@ -1196,7 +1196,8 @@ int pim_rp_config_write(struct pim_instance *pim, struct vty *vty,
 	return count;
 }
 
-void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
+void pim_rp_show_information(struct pim_instance *pim, struct vty *vty,
+			     json_object *json)
 {
 	struct rp_info *rp_info;
 	struct rp_info *prev_rp_info = NULL;
@@ -1204,13 +1205,10 @@ void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
 	char source[7];
 	char buf[PREFIX_STRLEN];
 
-	json_object *json = NULL;
 	json_object *json_rp_rows = NULL;
 	json_object *json_row = NULL;
 
-	if (uj)
-		json = json_object_new_object();
-	else
+	if (!json)
 		vty_out(vty,
 			"RP address       group/prefix-list   OIF               I am RP    Source\n");
 	for (ALL_LIST_ELEMENTS_RO(pim->rp_list, node, rp_info)) {
@@ -1223,22 +1221,19 @@ void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
 				strlcpy(source, "BSR", sizeof(source));
 			else
 				strlcpy(source, "None", sizeof(source));
-			if (uj) {
+			if (json) {
 				/*
 				 * If we have moved on to a new RP then add the
 				 * entry for the previous RP
 				 */
-				if (prev_rp_info
-				    && prev_rp_info->rp.rpf_addr.u.prefix4
-						       .s_addr
-					       != rp_info->rp.rpf_addr.u.prefix4
-							  .s_addr) {
+				if (prev_rp_info &&
+				    prefix_same(&prev_rp_info->rp.rpf_addr,
+						&rp_info->rp.rpf_addr)) {
 					json_object_object_add(
 						json,
-						inet_ntop(AF_INET,
+						inet_ntop(PIM_AF,
 							  &prev_rp_info->rp
-								  .rpf_addr.u
-								  .prefix4,
+								   .rpf_addr,
 							  buf, sizeof(buf)),
 						json_rp_rows);
 					json_rp_rows = NULL;
@@ -1249,8 +1244,8 @@ void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
 
 				json_row = json_object_new_object();
 				json_object_string_addf(
-					json_row, "rpAddress", "%pI4",
-					&rp_info->rp.rpf_addr.u.prefix4);
+					json_row, "rpAddress", "%pFX",
+					&rp_info->rp.rpf_addr);
 				if (rp_info->rp.source_nexthop.interface)
 					json_object_string_add(
 						json_row, "outboundInterface",
@@ -1280,11 +1275,7 @@ void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
 
 				json_object_array_add(json_rp_rows, json_row);
 			} else {
-				vty_out(vty, "%-15s  ",
-					inet_ntop(AF_INET,
-						  &rp_info->rp.rpf_addr.u
-							  .prefix4,
-						  buf, sizeof(buf)));
+				vty_out(vty, "%-15pFX ", &rp_info->rp.rpf_addr);
 
 				if (rp_info->plist)
 					vty_out(vty, "%-18s  ", rp_info->plist);
@@ -1310,16 +1301,13 @@ void pim_rp_show_information(struct pim_instance *pim, struct vty *vty, bool uj)
 		}
 	}
 
-	if (uj) {
+	if (json) {
 		if (prev_rp_info && json_rp_rows)
 			json_object_object_add(
 				json,
-				inet_ntop(AF_INET,
-					  &prev_rp_info->rp.rpf_addr.u.prefix4,
+				inet_ntop(PIM_AF, &prev_rp_info->rp.rpf_addr,
 					  buf, sizeof(buf)),
 				json_rp_rows);
-
-		vty_json(vty, json);
 	}
 }
 
