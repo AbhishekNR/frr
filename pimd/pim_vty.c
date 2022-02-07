@@ -401,6 +401,15 @@ int pim_config_write(struct vty *vty, int writes, struct interface *ifp,
 }
 #endif
 
+#if PIM_IPV == 6
+int pim6_config_write(struct vty *vty, int writes, struct interface *ifp,
+		      struct pim_instance *pim)
+{
+	/* TBD Depends on MLD data structure changes */
+	return writes;
+}
+#endif
+
 int pim_interface_config_write(struct vty *vty)
 {
 	struct pim_instance *pim;
@@ -430,12 +439,14 @@ int pim_interface_config_write(struct vty *vty)
 				vty_out(vty, " description %s\n", ifp->desc);
 				++writes;
 			}
-			if (ifp->info)
+
+			if (ifp->info) {
 #if PIM_IPV == 4
 				pim_config_write(vty, writes, ifp, pim);
 #else
- 				pim6_config_write(vty, writes, ifp, pim);
+				pim6_config_write(vty, writes, ifp, pim);
 #endif
+			}
 			if_vty_config_end(vty);
 
 			++writes;
