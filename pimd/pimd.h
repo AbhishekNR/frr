@@ -21,6 +21,7 @@
 #define PIMD_H
 
 #include <stdint.h>
+#include "command.h"
 #include "zebra.h"
 #include "libfrr.h"
 #include "prefix.h"
@@ -275,4 +276,6 @@ extern void pim_route_map_terminate(void);
 void pim_prefix_list_update(struct prefix_list *plist);
 
 const char *pim_cli_get_vrf_name(struct vty *vty);
+struct vrf *pim_cmd_lookup_vrf(struct vty *vty, struct cmd_token *argv[],
+			       const int argc, int *idx);
 #endif /* PIMD_H */

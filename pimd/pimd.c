@@ -188,3 +188,20 @@ const char *pim_cli_get_vrf_name(struct vty *vty)
 
 	return yang_dnode_get_string(vrf_node, "./name");
 }
+
+struct vrf *pim_cmd_lookup_vrf(struct vty *vty, struct cmd_token *argv[],
+			       const int argc, int *idx)
+{
+	struct vrf *vrf;
+
+	if (argv_find(argv, argc, "NAME", idx))
+		vrf = vrf_lookup_by_name(argv[*idx]->arg);
+	else
+		vrf = vrf_lookup_by_id(VRF_DEFAULT);
+
+	if (!vrf)
+		vty_out(vty, "Specified VRF: %s does not exist\n",
+			argv[*idx]->arg);
+
+	return vrf;
+}
