@@ -181,34 +181,27 @@ static void show_rpf_refresh_stats(struct vty *vty, struct pim_instance *pim,
 	}
 }
 
-void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
+void pim_show_rpf(struct pim_instance *pim, struct vty *vty, json_object *json)
 {
 	struct pim_upstream *up;
 	time_t now = pim_time_monotonic_sec();
-	json_object *json = NULL;
 	json_object *json_group = NULL;
 	json_object *json_row = NULL;
 
-	if (uj) {
-		json = json_object_new_object();
-		show_rpf_refresh_stats(vty, pim, now, json);
-	} else {
-		show_rpf_refresh_stats(vty, pim, now, json);
+	show_rpf_refresh_stats(vty, pim, now, json);
+
+	if (!json) {
 		vty_out(vty, "\n");
 		vty_out(vty,
 			"Source          Group           RpfIface         RpfAddress      RibNextHop      Metric Pref\n");
 	}
 
 	frr_each (rb_pim_upstream, &pim->upstream_head, up) {
-		char src_str[INET_ADDRSTRLEN];
-		char grp_str[INET_ADDRSTRLEN];
 		char rpf_addr_str[PREFIX_STRLEN];
 		char rib_nexthop_str[PREFIX_STRLEN];
 		const char *rpf_ifname;
 		struct pim_rpf *rpf = &up->rpf;
 
-		pim_inet4_dump("<src?>", up->sg.src, src_str, sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp, grp_str, sizeof(grp_str));
 		pim_addr_dump("<rpf?>", &rpf->rpf_addr, rpf_addr_str,
 			      sizeof(rpf_addr_str));
 		pim_addr_dump("<nexthop?>",
@@ -220,7 +213,15 @@ void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 								.interface->name
 						      : "<ifname?>";
 
-		if (uj) {
+		if (json) {
+			char src_str[PIM_ADDRSTRLEN];
+			char grp_str[PIM_ADDRSTRLEN];
+
+			snprintfrr(grp_str, sizeof(grp_str), "%pPAs",
+				   &up->sg.grp);
+			snprintfrr(src_str, sizeof(src_str), "%pPAs",
+				   &up->sg.src);
+
 			json_object_object_get_ex(json, grp_str, &json_group);
 
 			if (!json_group) {
@@ -230,8 +231,10 @@ void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 			}
 
 			json_row = json_object_new_object();
-			json_object_string_add(json_row, "source", src_str);
-			json_object_string_add(json_row, "group", grp_str);
+			json_object_string_addf(json_row, "source", "%pPAs",
+						&up->sg.src);
+			json_object_string_addf(json_row, "group", "%pPAs",
+						&up->sg.grp);
 			json_object_string_add(json_row, "rpfInterface",
 					       rpf_ifname);
 			json_object_string_add(json_row, "rpfAddress",
@@ -247,16 +250,14 @@ void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 			json_object_object_add(json_group, src_str, json_row);
 
 		} else {
-			vty_out(vty, "%-15s %-15s %-16s %-15s %-15s %6d %4d\n",
-				src_str, grp_str, rpf_ifname, rpf_addr_str,
-				rib_nexthop_str,
+			vty_out(vty,
+				"%-15pPAs %-15pPAs %-16s %-15s %-15s %6d %4d\n",
+				&up->sg.src, &up->sg.grp, rpf_ifname,
+				rpf_addr_str, rib_nexthop_str,
 				rpf->source_nexthop.mrib_route_metric,
 				rpf->source_nexthop.mrib_metric_preference);
 		}
 	}
-
-	if (uj)
-		vty_json(vty, json);
 }
 
 static void show_scan_oil_stats(struct pim_instance *pim, struct vty *vty,

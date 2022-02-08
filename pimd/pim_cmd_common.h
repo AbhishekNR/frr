@@ -21,7 +21,7 @@
 #define PIM_CMD_COMMON_H
 
 void json_object_pim_upstream_add(json_object *json, struct pim_upstream *up);
-void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj);
+void pim_show_rpf(struct pim_instance *pim, struct vty *vty, json_object *json);
 void pim_cmd_show_ip_multicast_helper(struct pim_instance *pim,
 				      struct vty *vty);
 void show_multicast_interfaces(struct pim_instance *pim, struct vty *vty,
