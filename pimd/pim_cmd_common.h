@@ -20,6 +20,22 @@
 #ifndef PIM_CMD_COMMON_H
 #define PIM_CMD_COMMON_H
 
+void json_object_pim_upstream_add(json_object *json, struct pim_upstream *up);
+void pim_show_rpf(struct pim_instance *pim, struct vty *vty, bool uj);
+void pim_cmd_show_ip_multicast_helper(struct pim_instance *pim,
+				      struct vty *vty);
+void show_multicast_interfaces(struct pim_instance *pim, struct vty *vty,
+			       bool uj);
+void pim_show_neighbors_secondary(struct pim_instance *pim, struct vty *vty);
+void pim_show_state(struct pim_instance *pim, struct vty *vty,
+		    const char *src_or_group, const char *group, bool uj);
+void pim_show_statistics(struct pim_instance *pim, struct vty *vty,
+			 const char *ifname, bool uj);
+void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
+		       pim_sgaddr *sg, bool uj);
+void pim_show_join_desired(struct pim_instance *pim, struct vty *vty, bool uj);
+void pim_show_upstream_rpf(struct pim_instance *pim, struct vty *vty, bool uj);
+
 /*
  * Special Macro to allow us to get the correct pim_instance;
  */
