@@ -39,14 +39,5 @@
 #define DEBUG_MLD_TRACE_STR "MLD internal daemon activity\n"
 
 void pim_cmd_init(void);
-/*
- * Special Macro to allow us to get the correct pim_instance;
- */
-#define PIM_DECLVAR_CONTEXT(A, B) \
-	do { \
-		struct vrf *A = VTY_GET_CONTEXT(vrf); \
-		struct pim_instance *B = \
-			(vrf) ? vrf->info : pim_get_pim_instance(VRF_DEFAULT); \
-		vrf = (vrf) ? vrf : pim->vrf; \
-	} while (0)
+
 #endif /* PIM6_CMD_H */

@@ -21,6 +21,7 @@ pim_common = \
 	pimd/pim_bfd.c \
 	pimd/pim_br.c \
 	pimd/pim_bsm.c \
+	pimd/pim_cmd_common.c \
 	pimd/pim_errors.c \
 	pimd/pim_hello.c \
 	pimd/pim_iface.c \
@@ -147,6 +148,7 @@ noinst_HEADERS += \
 	pimd/mtracebis_netlink.h \
 	pimd/mtracebis_routeget.h \
 	pimd/pim6_cmd.h \
+	pimd/pim_cmd_common.h \
 	# end
 
 clippy_scan += \

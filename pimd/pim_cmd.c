@@ -33,6 +33,7 @@
 #include "pimd.h"
 #include "pim_mroute.h"
 #include "pim_cmd.h"
+#include "pim_cmd_common.h"
 #include "pim_iface.h"
 #include "pim_vty.h"
 #include "pim_mroute.h"
