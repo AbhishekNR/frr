@@ -4186,7 +4186,7 @@ DEFUN (show_ip_pim_neighbor_vrf_all,
 	return CMD_SUCCESS;
 }
 
-DEFUN (show_ip_pim_secondary,
+DEFPY (show_ip_pim_secondary,
        show_ip_pim_secondary_cmd,
        "show ip pim [vrf NAME] secondary",
        SHOW_STR
@@ -4195,13 +4195,13 @@ DEFUN (show_ip_pim_secondary,
        VRF_CMD_HELP_STR
        "PIM neighbor addresses\n")
 {
-	int idx = 2;
-	struct vrf *vrf = pim_cmd_lookup_vrf(vty, argv, argc, &idx);
+	struct vrf *v =
+		vrf_lookup_by_name(vrf ? vrf : VRF_DEFAULT_NAME);
 
-	if (!vrf)
+	if (!v)
 		return CMD_WARNING;
 
-	pim_show_neighbors_secondary(vrf->info, vty);
+	pim_show_neighbors_secondary(v->info, vty);
 
 	return CMD_SUCCESS;
 }
