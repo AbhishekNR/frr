@@ -184,6 +184,33 @@ DEFPY (show_ipv6_pim_secondary,
 	return CMD_SUCCESS;
 }
 
+DEFPY (show_ipv6_pim_statistics,
+       show_ipv6_pim_statistics_cmd,
+       "show ipv6 pim [vrf NAME] statistics [interface WORD$word] [json]",
+       SHOW_STR
+       IPV6_STR
+       PIM_STR
+       VRF_CMD_HELP_STR
+       "PIM statistics\n"
+       INTERFACE_STR
+       "PIM interface\n"
+       JSON_STR)
+{
+	struct vrf *v =
+		vrf_lookup_by_name(vrf ? vrf : VRF_DEFAULT_NAME);
+	bool uj = use_json(argc, argv);
+
+	if (!v)
+		return CMD_WARNING;
+
+	if (word)
+		pim_show_statistics(v->info, vty, word, uj);
+	else
+		pim_show_statistics(v->info, vty, NULL, uj);
+
+	return CMD_SUCCESS;
+}
+
 void pim_cmd_init(void)
 {
 	if_cmd_init(pim_interface_config_write);
@@ -192,4 +219,5 @@ void pim_cmd_init(void)
 	install_element(VIEW_NODE, &show_ipv6_pim_rpf_cmd);
 	install_element(VIEW_NODE, &show_ipv6_pim_rpf_vrf_all_cmd);
 	install_element(VIEW_NODE, &show_ipv6_pim_secondary_cmd);
+	install_element(VIEW_NODE, &show_ipv6_pim_statistics_cmd);
 }
