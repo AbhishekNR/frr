@@ -80,14 +80,6 @@ static struct cmd_node debug_node = {
 	.config_write = pim_debug_config_write,
 };
 
-static inline bool pim_sgaddr_match(pim_sgaddr item, pim_sgaddr match)
-{
-	return (pim_addr_is_any(match.grp) ||
-		!pim_addr_cmp(match.grp, item.grp)) &&
-	       (pim_addr_is_any(match.src) ||
-		!pim_addr_cmp(match.src, item.src));
-}
-
 static void pim_show_assert_helper(struct vty *vty,
 				   struct pim_interface *pim_ifp,
 				   struct pim_ifchannel *ch, time_t now)

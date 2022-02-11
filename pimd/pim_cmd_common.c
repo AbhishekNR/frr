@@ -43,6 +43,14 @@
 #include "lib/linklist.h"
 #include "pim_neighbor.h"
 
+static inline bool pim_sgaddr_match(pim_sgaddr item, pim_sgaddr match)
+{
+	return (pim_addr_is_any(match.grp) ||
+		!pim_addr_cmp(match.grp, item.grp)) &&
+	       (pim_addr_is_any(match.src) ||
+		!pim_addr_cmp(match.src, item.src));
+}
+
 void json_object_pim_upstream_add(json_object *json, struct pim_upstream *up)
 {
 	if (up->flags & PIM_UPSTREAM_FLAG_MASK_DR_JOIN_DESIRED)
