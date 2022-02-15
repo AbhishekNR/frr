@@ -982,8 +982,6 @@ void pim_show_upstream_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 			"Source          Group           RpfIface         RibNextHop      RpfAddress     \n");
 
 	frr_each (rb_pim_upstream, &pim->upstream_head, up) {
-		char src_str[INET_ADDRSTRLEN];
-		char grp_str[INET_ADDRSTRLEN];
 		char rpf_nexthop_str[PREFIX_STRLEN];
 		char rpf_addr_str[PREFIX_STRLEN];
 		struct pim_rpf *rpf;
@@ -991,8 +989,6 @@ void pim_show_upstream_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 
 		rpf = &up->rpf;
 
-		pim_inet4_dump("<src?>", up->sg.src, src_str, sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp, grp_str, sizeof(grp_str));
 		pim_addr_dump("<nexthop?>",
 			      &rpf->source_nexthop.mrib_nexthop_addr,
 			      rpf_nexthop_str, sizeof(rpf_nexthop_str));
@@ -1005,6 +1001,14 @@ void pim_show_upstream_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 						      : "<ifname?>";
 
 		if (uj) {
+			char grp_str[PIM_ADDRSTRLEN];
+			char src_str[PIM_ADDRSTRLEN];
+
+			snprintfrr(grp_str, sizeof(grp_str), "%pPAs",
+				   &up->sg.grp);
+			snprintfrr(src_str, sizeof(src_str), "%pPAs",
+				   &up->sg.src);
+
 			json_object_object_get_ex(json, grp_str, &json_group);
 
 			if (!json_group) {
@@ -1025,9 +1029,9 @@ void pim_show_upstream_rpf(struct pim_instance *pim, struct vty *vty, bool uj)
 					       rpf_addr_str);
 			json_object_object_add(json_group, src_str, json_row);
 		} else {
-			vty_out(vty, "%-15s %-15s %-16s %-15s %-15s\n", src_str,
-				grp_str, rpf_ifname, rpf_nexthop_str,
-				rpf_addr_str);
+			vty_out(vty, "%-15pPAs %-15pPAs %-16s %-15s %-15s\n",
+				&up->sg.src, &up->sg.grp, rpf_ifname,
+				rpf_nexthop_str, rpf_addr_str);
 		}
 	}
 
