@@ -452,10 +452,10 @@ void pim_show_neighbors_secondary(struct pim_instance *pim, struct vty *vty)
 }
 
 void pim_show_state(struct pim_instance *pim, struct vty *vty,
-		    const char *src_or_group, const char *group, bool uj)
+		    const char *src_or_group, const char *group,
+		    json_object *json)
 {
 	struct channel_oil *c_oil;
-	json_object *json = NULL;
 	json_object *json_group = NULL;
 	json_object *json_ifp_in = NULL;
 	json_object *json_ifp_out = NULL;
@@ -465,9 +465,7 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 
 	now = pim_time_monotonic_sec();
 
-	if (uj) {
-		json = json_object_new_object();
-	} else {
+	if (!json) {
 		vty_out(vty,
 			"Codes: J -> Pim Join, I -> IGMP Report, S -> Source, * -> Inherited from (*,G), V -> VxLAN, M -> Muted");
 		vty_out(vty,
@@ -475,8 +473,8 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 	}
 
 	frr_each (rb_pim_oil, &pim->channel_oil_head, c_oil) {
-		char grp_str[INET_ADDRSTRLEN];
-		char src_str[INET_ADDRSTRLEN];
+		char src_str[PIM_ADDRSTRLEN];
+		char grp_str[PIM_ADDRSTRLEN];
 		char in_ifname[INTERFACE_NAMSIZ + 1];
 		char out_ifname[INTERFACE_NAMSIZ + 1];
 		int oif_vif_index;
@@ -492,10 +490,11 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 		else
 			isRpt = false;
 
-		pim_inet4_dump("<group?>", c_oil->oil.mfcc_mcastgrp, grp_str,
-			       sizeof(grp_str));
-		pim_inet4_dump("<source?>", c_oil->oil.mfcc_origin, src_str,
-			       sizeof(src_str));
+		snprintfrr(grp_str, sizeof(grp_str), "%pPAs",
+			   &c_oil->oil.mfcc_mcastgrp);
+		snprintfrr(src_str, sizeof(src_str), "%pPAs",
+			   &c_oil->oil.mfcc_origin);
+
 		ifp_in = pim_if_find_by_vif_index(pim, c_oil->oil.mfcc_parent);
 
 		if (ifp_in)
@@ -512,7 +511,7 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 				continue;
 		}
 
-		if (uj) {
+		if (json) {
 
 			/* Find the group, create it if it doesn't exist */
 			json_object_object_get_ex(json, grp_str, &json_group);
@@ -571,9 +570,10 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 						    c_oil->cc.wrong_if);
 			}
 		} else {
-			vty_out(vty, "%-6d %-15s  %-15s  %-3s  %-16s  ",
-				c_oil->installed, src_str, grp_str,
-				isRpt ? "y" : "n", in_ifname);
+			vty_out(vty, "%-6d %-15pPAs  %-15pPAs  %-3s  %-16s  ",
+				c_oil->installed, &c_oil->oil.mfcc_origin,
+				&c_oil->oil.mfcc_mcastgrp, isRpt ? "y" : "n",
+				in_ifname);
 		}
 
 		for (oif_vif_index = 0; oif_vif_index < MAXVIFS;
@@ -598,7 +598,7 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 				strlcpy(out_ifname, "<oif?>",
 					sizeof(out_ifname));
 
-			if (uj) {
+			if (json) {
 				json_ifp_out = json_object_new_object();
 				json_object_string_add(json_ifp_out, "source",
 						       src_str);
@@ -676,14 +676,11 @@ void pim_show_state(struct pim_instance *pim, struct vty *vty,
 			}
 		}
 
-		if (!uj)
+		if (!json)
 			vty_out(vty, "\n");
 	}
 
-
-	if (uj)
-		vty_json(vty, json);
-	else
+	if (!json)
 		vty_out(vty, "\n");
 }
 

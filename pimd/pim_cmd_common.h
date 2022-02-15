@@ -28,7 +28,8 @@ void show_multicast_interfaces(struct pim_instance *pim, struct vty *vty,
 			       bool uj);
 void pim_show_neighbors_secondary(struct pim_instance *pim, struct vty *vty);
 void pim_show_state(struct pim_instance *pim, struct vty *vty,
-		    const char *src_or_group, const char *group, bool uj);
+		    const char *src_or_group, const char *group,
+		    json_object *json);
 void pim_show_statistics(struct pim_instance *pim, struct vty *vty,
 			 const char *ifname, bool uj);
 void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
