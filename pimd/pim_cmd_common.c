@@ -43,7 +43,7 @@
 #include "lib/linklist.h"
 #include "pim_neighbor.h"
 
-static inline bool pim_sgaddr_match(pim_sgaddr item, pim_sgaddr match)
+bool pim_sgaddr_match(pim_sgaddr item, pim_sgaddr match)
 {
 	return (pim_addr_is_any(match.grp) ||
 		!pim_addr_cmp(match.grp, item.grp)) &&
@@ -760,25 +760,20 @@ void pim_show_statistics(struct pim_instance *pim, struct vty *vty,
 }
 
 void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
-		       pim_sgaddr *sg, bool uj)
+		       pim_sgaddr *sg, json_object *json)
 {
 	struct pim_upstream *up;
 	time_t now;
-	json_object *json = NULL;
 	json_object *json_group = NULL;
 	json_object *json_row = NULL;
 
 	now = pim_time_monotonic_sec();
 
-	if (uj)
-		json = json_object_new_object();
-	else
+	if (!json)
 		vty_out(vty,
 			"Iif             Source          Group           State       Uptime   JoinTimer RSTimer   KATimer   RefCnt\n");
 
 	frr_each (rb_pim_upstream, &pim->upstream_head, up) {
-		char src_str[INET_ADDRSTRLEN];
-		char grp_str[INET_ADDRSTRLEN];
 		char uptime[10];
 		char join_timer[10];
 		char rs_timer[10];
@@ -786,15 +781,9 @@ void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
 		char msdp_reg_timer[10];
 		char state_str[PIM_REG_STATE_STR_LEN];
 
-		if (sg->grp.s_addr != INADDR_ANY &&
-		    sg->grp.s_addr != up->sg.grp.s_addr)
-			continue;
-		if (sg->src.s_addr != INADDR_ANY &&
-		    sg->src.s_addr != up->sg.src.s_addr)
+		if (!pim_sgaddr_match(up->sg, *sg))
 			continue;
 
-		pim_inet4_dump("<src?>", up->sg.src, src_str, sizeof(src_str));
-		pim_inet4_dump("<grp?>", up->sg.grp, grp_str, sizeof(grp_str));
 		pim_time_uptime(uptime, sizeof(uptime),
 				now - up->state_transition);
 		pim_time_timer_to_hhmmss(join_timer, sizeof(join_timer),
@@ -835,7 +824,15 @@ void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
 			strlcat(state_str, tmp, sizeof(state_str));
 		}
 
-		if (uj) {
+		if (json) {
+			char grp_str[PIM_ADDRSTRLEN];
+			char src_str[PIM_ADDRSTRLEN];
+
+			snprintfrr(grp_str, sizeof(grp_str), "%pPAs",
+				   &up->sg.grp);
+			snprintfrr(src_str, sizeof(src_str), "%pPAs",
+				   &up->sg.src);
+
 			json_object_object_get_ex(json, grp_str, &json_group);
 
 			if (!json_group) {
@@ -860,7 +857,7 @@ void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
 			 * the RP as the rpfAddress
 			 */
 			if (up->flags & PIM_UPSTREAM_FLAG_MASK_FHR ||
-			    up->sg.src.s_addr == INADDR_ANY) {
+			    pim_addr_is_any(up->sg.src)) {
 				char rpf[PREFIX_STRLEN];
 				struct pim_rpf *rpg;
 
@@ -900,17 +897,14 @@ void pim_show_upstream(struct pim_instance *pim, struct vty *vty,
 			json_object_object_add(json_group, src_str, json_row);
 		} else {
 			vty_out(vty,
-				"%-16s%-15s %-15s %-11s %-8s %-9s %-9s %-9s %6d\n",
+				"%-16s%-15pPAs %-15pPAs %-11s %-8s %-9s %-9s %-9s %6d\n",
 				up->rpf.source_nexthop.interface
 				? up->rpf.source_nexthop.interface->name
 				: "Unknown",
-				src_str, grp_str, state_str, uptime, join_timer,
-				rs_timer, ka_timer, up->ref_count);
+				&up->sg.src, &up->sg.grp, state_str, uptime,
+				join_timer, rs_timer, ka_timer, up->ref_count);
 		}
 	}
-
-	if (uj)
-		vty_json(vty, json);
 }
 
 static void pim_show_join_desired_helper(struct pim_instance *pim,
